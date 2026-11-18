@@ -62,4 +62,4 @@ O protótipo funciona diretamente no navegador, sem backend ou banco de dados. O
 - Utilize o **Modo de demonstração**, disponível no rodapé, para navegar entre as telas.
 - Os chamados criados ficam salvos no navegador.
 - Para voltar ao estado inicial, utilize a opção **Restaurar dados de exemplo**.
-- Para criar novos problemas, edite `TF.TREE` e `TF.RESULTS` em `js/data.js`.TF.RESULTS` em `data.js`.
+- Para criar novos problemas, edite `TF.TREE` e `TF.RESULTS` em `js/data.js`.
