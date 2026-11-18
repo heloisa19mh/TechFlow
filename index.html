@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <title>TechFlow · Suporte Inteligente de TI</title>
+  <meta name="description" content="Protótipo de triagem guiada de chamados de TI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dusk.css">
+</head>
+
+<body>
+  <a class="skip" href="#app">Pular para o conteúdo</a>
+
+  <div id="stars" aria-hidden="true"></div>
+  <div id="wipe" aria-hidden="true"><img src="img/mark.png" alt="" draggable="false"></div>
+  <div id="bar"></div>
+
+  <main>
+    <div id="app" tabindex="-1"></div>
+  </main>
+
+  <!-- Painel de apoio à apresentação: permite pular entre as 7 telas do MVP -->
+  <details class="demo" id="demo">
+    <summary>Modo demonstração (apresentação do protótipo)</summary>
+    <div class="wrap demo-body">
+      <p class="muted">Pule direto para qualquer uma das 7 telas do MVP. Os dados dos chamados ficam salvos só neste navegador.</p>
+      <div class="chips" id="chips"></div>
+      <button class="btn btn-ghost" data-act="resetdata">Restaurar dados de exemplo</button>
+    </div>
+  </details>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/site.js"></script>
+  <script src="js/views.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

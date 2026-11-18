@@ -1,0 +1,60 @@
+/* TechFlow · páginas do site (Início, Como funciona, Categorias, Planos, Ajuda) */
+(function () {
+  "use strict";
+  var esc = TF.esc, S = TF.S, site = TF.site = {};
+  S.page = "home"; S.plan = "sla";
+  TF.PAGES = [["home", "Visão geral"], ["how", "Como funciona"], ["cats", "Categorias"], ["plans", "Prioridades"], ["help", "Ajuda"]];
+
+  var STEPS = [
+    ["09:02", "Descreva o problema", "Conte em uma frase o que está acontecendo. O TechFlow sugere a categoria sozinho.", "cat"],
+    ["09:03", "Responda poucas perguntas", "Duas ou três perguntas de sim ou não levam à causa provável.", "q"],
+    ["09:05", "Teste a solução", "Passos curtos para tentar sozinho, marcados um a um.", "sol"],
+    ["09:12", "Chamado já preenchido", "Se não resolver, o chamado segue com categoria, prioridade e histórico.", "tk"],
+    ["09:40", "O técnico resolve", "A fila é ordenada por prioridade. A solução fica registrada.", "done"]];
+  var WANT = [["Resolver sozinho", "Muitos problemas se resolvem em minutos, sem abrir chamado."], ["Priorizar o urgente", "A prioridade é calculada pela triagem, não por quem grita mais."], ["Não repetir tudo", "O técnico recebe o caminho do diagnóstico e as suas observações."], ["Fechar com registro", "Cada solução fica anotada para o próximo caso parecido."]];
+  var QUOTES = [["Resolvido em 5 min", "Meu monitor voltou só trocando a entrada de vídeo. Nem precisei chamar ninguém.", "Beatriz Lima"], ["Fila organizada", "Agora o técnico já sabe o que eu testei. Acabou a ladainha de perguntas.", "Lucas Almeida"], ["Prioridade alta", "Seis pessoas do financeiro sem internet e o chamado subiu para o topo da fila.", "Carla Menezes"], ["Sem formulário", "Responder sim ou não é bem mais fácil do que descrever o erro.", "Rafael Duarte"], ["E-mail de volta", "O webmail me salvou enquanto o aplicativo era corrigido.", "Joana Ribeiro"], ["Conta liberada", "Conta bloqueada às 9h e desbloqueada logo depois do chamado.", "Paulo Nogueira"], ["Histórico completo", "Tudo o que respondi aparece no painel. Isso economiza tempo dos dois lados.", "Marina Costa"], ["Autoatendimento", "A senha foi redefinida pelo portal em dois minutos.", "Lucas Almeida"]];
+  var FAQ = [["Preciso instalar algum programa?", "Não. O TechFlow roda direto no navegador, sem backend nem banco de dados."], ["Meus chamados ficam salvos?", "Ficam no navegador (localStorage). Use “Restaurar dados de exemplo” para voltar ao início."], ["Como a prioridade é definida?", "Pela triagem: o resultado do diagnóstico define Alta, Média ou Baixa e o prazo do primeiro atendimento."], ["Posso anexar imagens?", "Sim, na tela do chamado. No protótipo apenas o nome do arquivo é guardado."], ["Existe atalho de teclado?", "Nas perguntas, use 1 (Sim), 2 (Não) e 3 (Não sei / Outro)."]];
+  var phoneScr = {
+    cat: '<div class="pt"><small>Olá, Luany</small><h4>Como podemos ajudar?</h4></div><div class="grp"><div class="bx"><small>Você descreveu</small><img class="ci inl" src="img/ico-impressoras.png" alt="">Impressora não imprime…</div><div class="bx hl"><small>Categoria sugerida</small>Parece ser <b>Impressoras &amp; Periféricos</b></div></div><div class="pb"><div class="bt">Usar esta categoria</div></div>',
+    q: '<div class="pt"><div class="pgb"><i style="width:50%"></i></div><small>Pergunta 1 · 50%</small><h4>A impressora está ligada e sem luzes de erro?</h4></div><div class="grp"><div class="bt">Sim</div><div class="bx">Não</div><div class="bx">Não sei / Outro</div></div><div class="pb"><small>Você pode voltar a qualquer momento</small></div>',
+    sol: '<div class="pt"><small>Causa provável</small><h4>Trabalho travado na fila</h4></div><div class="grp"><div class="bx ck on">Cancele os documentos</div><div class="bx ck">Reinicie a impressora</div><div class="bx ck">Envie uma cópia</div></div><div class="pb"><div class="bt">Resolveu o problema</div></div>',
+    tk: '<div class="pt"><small>Chamado #TF-2026-089</small><h4>Confirmar chamado</h4></div><div class="grp"><div class="bx"><small>Prioridade</small><b>Média</b></div><div class="bx"><small>Anexo</small>Caminho do diagnóstico</div></div><div class="pb"><div class="bt o">Enviar chamado</div></div>',
+    done: '<div class="pt" style="align-items:center;text-align:center"><div class="big">✔</div><h4>Chamado encerrado</h4></div><div class="grp"><div class="bx">Solução registrada pela equipe de TI</div></div>'
+  };
+  function phone(inner) { return '<div class="phone"><div class="sb"><span>9:41</span><span>▂▄▆ ▮</span></div><div class="in">' + inner + '</div></div>'; }
+  function avgMin(p) { var l = Object.keys(TF.RESULTS).map(function (k) { return TF.RESULTS[k]; }).filter(function (r) { return r.pri === p; }); return Math.round(l.reduce(function (a, r) { return a + r.mins; }, 0) / (l.length || 1)); }
+  function hero(h1, h2, p, extra, sm) { return '<section class="heroN' + (sm ? " sm" : "") + '"><div><h1><span>' + h1 + '</span>' + (h2 ? '<span>' + h2 + '</span>' : '') + '</h1><p>' + p + '</p>' + (extra || "") + '</div></section>'; }
+  function faq() { return '<section class="faq"><div class="wrap"><h2>Dúvidas antes de abrir um chamado</h2><div>' + FAQ.map(function (f) { return '<details><summary>' + esc(f[0]) + '</summary><p>' + esc(f[1]) + '</p></details>'; }).join("") + '</div></div></section>'; }
+  function plansHtml() {
+    var sla = S.plan === "sla", P = [["Baixa", "Para começar", "O trabalho continua, só mais devagar."], ["Média", "Mais comum", "Impacto parcial no dia de trabalho."], ["Alta", "Urgente", "Usuário parado ou vários afetados."]];
+    return '<section class="plans"><div class="wrap"><h2>Escolha o que é urgente</h2><p class="lead">A triagem calcula a prioridade. Você só precisa responder.</p><div class="tog" role="group"><button data-act="plan" data-v="sla" aria-pressed="' + sla + '">Primeiro atendimento</button><button data-act="plan" data-v="min" aria-pressed="' + !sla + '">Tempo médio de solução</button></div><div class="pg">' +
+      P.map(function (p, i) { return '<div class="pc' + (i === 1 ? " hot" : "") + '"><div class="hd"><h3>' + p[0] + '</h3><span class="tg2">' + p[1] + '</span></div><div class="pr">' + (sla ? esc(TF.SLA[p[0]].replace("até ", "")) : avgMin(p[0]) + ' <small>min</small>') + '</div><p class="muted">' + p[2] + '</p><ul><li>Diagnóstico guiado</li><li>Histórico enviado ao técnico</li><li>' + (i === 2 ? "Topo da fila" : "Fila por prioridade") + '</li></ul><button class="bt2" data-act="start">Abrir diagnóstico</button></div>'; }).join("") + '</div></div></section>';
+  }
+  site.footer = function () { return '<footer class="ft"><div class="wrap"><div><div class="logo"><img src="img/logo.png" alt="TechFlow · Suporte de TI, sem complicação"></div><p>Suporte inteligente de TI · protótipo de Laboratório de Inovação.</p></div><div><button class="btn btn-ghost" data-act="resetdata">Restaurar dados de exemplo</button></div></div></footer>'; };
+
+  site.home = function () {
+    var done = TF.store.tickets.filter(function (t) { return t.status === "Concluído"; }).length;
+    var cards = TF.CATS.map(function (c, i) { return '<div class="sd" data-act="shortcut" data-c="' + c.id + '"><div class="im g' + i + '"><span>' + TF.icon(c.id, "w") + '</span><div class="pl">▶</div></div><b>' + esc(c.name) + '</b><small>' + esc(c.sub) + '</small></div>'; }).join("");
+    var mq = function (a, r) { var h = a.map(function (q) { return '<div class="tm"><span class="tag">☾ ' + esc(q[0]) + '</span><p>“' + esc(q[1]) + '”</p><div class="u"><span class="av">' + q[2][0] + '</span><span><b>' + esc(q[2]) + '</b>TechFlow</span></div></div>'; }).join(""); return '<div class="mq' + (r ? " rv" : "") + '">' + h + h + '</div>'; };
+    return '<section class="heroN hm"><div><div class="eyebrow2"><i></i>Suporte inteligente de TI</div><h1><span>Menos tempo resolvendo problemas.</span><span class="l">Mais tempo fluindo.</span></h1><p>Um jeito mais simples de cuidar da tecnologia. Descubra a solução com um diagnóstico guiado ou envie um chamado completo para a equipe de TI.</p><div class="hbtn"><button class="hb w" data-act="start">Acessar o TechFlow <b>\u2197</b></button><button class="hb g" data-act="down">Começar diagnóstico <b>\u2193</b></button></div><div class="hav"><span class="av2"><i>L</i><i>M</i><i>+</i></span>Suporte organizado, do primeiro clique à solução.</div></div><div class="scrl">Role para descobrir <u></u></div></section>' +
+      '<section class="night" id="night"><div class="st"><div><h2>Um chamado com o TechFlow</h2><ol>' + STEPS.map(function (s, i) { return '<li' + (i === 0 ? ' class="on"' : '') + '><button data-act="nstep" data-i="' + i + '"><b>' + s[0] + '</b>' + esc(s[1]) + '</button></li>'; }).join("") + '</ol><p id="np">' + esc(STEPS[0][2]) + '</p></div><div class="stage"><span class="ct" id="nc">01 / 05</span><span class="num" id="nn">09:02</span>' + phone('<span id="ns">' + phoneScr.cat + '</span>') + '</div></div></section>' +
+      '<section class="want" id="want"><div class="st"><div><small>O que você quer do suporte?</small>' + WANT.map(function (w, i) { return '<h3 data-i="' + i + '">' + w[0] + '</h3>'; }).join("") + '<p id="wp">' + WANT[0][1] + '</p></div></div></section>' +
+      '<section class="stats"><div class="wrap"><div class="sc1"><small>Depois de usar o TechFlow</small><div class="bn">−6 min</div><div style="display:flex;justify-content:space-between;align-items:end;gap:20px"><p style="max-width:26ch">por chamado, sem a primeira rodada de perguntas.</p><div class="mini"><b>' + TF.store.selfServed + '</b>resolvidos por autoatendimento este mês</div></div></div><div class="sc2"><small>Chamados no painel</small><div><div class="bn">' + TF.store.tickets.length + '</div><p>' + done + ' já encerrados pela equipe de TI</p></div></div></div></section>' +
+      '<section class="sounds"><div class="wrap"><h2>Escolha a área do problema</h2><button class="btn btn-ghost" data-act="nav" data-p="cats">Ver todas</button></div><div class="rail">' + cards + '</div></section>' +
+      '<section class="love"><h2>Aprovado por quem usa</h2>' + mq(QUOTES) + mq(QUOTES.slice().reverse(), 1) + '</section>' + plansHtml() + faq();
+  };
+  site.how = function () {
+    return hero("Como o TechFlow", "funciona", "Configure uma vez. A cada problema, o TechFlow faz a triagem por você.", "", 1) +
+      '<div class="wrap"><div class="steps4">' + ["Escolha a área", "Responda sim ou não", "Teste a solução", "Abra o chamado"].map(function (t, i) { return '<div class="stp"><b>' + (i + 1) + '</b><div><h3>' + t + '</h3><p class="muted">' + esc(STEPS[i][2]) + '</p></div></div>'; }).join("") + '</div></div>' + faq();
+  };
+  site.cats = function () {
+    return hero("Todas as áreas", "de TI", "Escolha a mais próxima do seu problema. As perguntas se ajustam.", "", 1) + '<div class="wrap"><div class="cg">' + TF.CATS.map(function (c) {
+      var n = TF.TREE[c.id].n, qs = Object.keys(n).map(function (k) { return '<li>' + esc(n[k].q) + '</li>'; }).join("");
+      return '<div class="cc"><div class="ic">' + TF.icon(c.id, "b") + '</div><h3>' + esc(c.name) + '</h3><p class="muted">' + esc(c.sub) + '</p><ul>' + qs + '</ul><button class="btn btn-primary" data-act="shortcut" data-c="' + c.id + '">Diagnosticar →</button></div>'; }).join("") + '</div></div>';
+  };
+  site.plans = function () { return hero("Prioridades simples", "para dias melhores", "Alta, Média ou Baixa. Cada uma com prazo claro de primeiro atendimento.", "", 1) + plansHtml() + faq(); };
+  site.help = function () {
+    return hero("Notas sobre", "suporte de TI", "Textos curtos com o passo a passo dos problemas mais comuns.", "", 1) + '<div class="wrap"><div class="art">' + Object.keys(TF.RESULTS).map(function (k) { var r = TF.RESULTS[k]; return '<article class="ar"><small>' + r.pri + ' · ' + r.mins + ' min</small><h3>' + esc(r.title) + '</h3><p>' + esc(r.why) + '</p><ol class="muted">' + r.steps.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join("") + '</ol></article>'; }).join("") + '</div></div>';
+  };
+  site.steps = STEPS; site.want = WANT; site.phoneScr = phoneScr;
+})();
